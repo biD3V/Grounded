@@ -1,0 +1,12 @@
+Package: com.bid3v.grounded
+Name: Grounded
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Stop people from disabling your connections while locked!
+Maintainer: biD3V
+Author: biD3V
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 11.0)
+Depiction: https://biD3V.github.io/repo/depictions/grounded.html
+SileoDepiction: https://biD3V.github.io/repo/depictions/sileo/grounded.json
+Icon: https://biD3V.github.io/repo/icons/Grounded.png
