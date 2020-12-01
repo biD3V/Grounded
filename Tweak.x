@@ -1,12 +1,11 @@
 @interface CCUIRoundButton : UIControl
 @end
 
-@interface SBLockScreenManager : NSObject
-
-@property (readonly) BOOL isUILocked;
-
-+ (instancetype)sharedInstance;
-
+@interface SBLockStateAggregator : NSObject {
+	NSInteger _lockState;
+}
++(id)sharedInstance;
+-(NSInteger)lockState;
 @end
 
 @interface UIView (Grounded)
@@ -42,7 +41,8 @@ static void loadPrefs() {
 %hook CCUIRoundButton
 
 - (BOOL)isEnabled {
-	if ([[%c(SBLockScreenManager) sharedInstance] isUILocked] && enabled) {
+	BOOL locked = [[%c(SBLockStateAggregator) sharedInstance] lockState] != 0 && [[%c(SBLockStateAggregator) sharedInstance] lockState] != 1;
+	if (locked && enabled) {
 		if ([[self.superview _viewDelegate] isKindOfClass:objc_getClass("CCUIConnectivityAirplaneViewController")] && !airplane) {
 			return false;
 		} else if ([[self.superview _viewDelegate] isKindOfClass:objc_getClass("CCUIConnectivityCellularDataViewController")] && !cellular) {

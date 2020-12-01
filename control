@@ -1,6 +1,6 @@
 Package: com.bid3v.grounded
 Name: Grounded
-Version: 1.0.0
+Version: 1.0.1
 Architecture: iphoneos-arm
 Description: Stop people from disabling your connections while locked!
 Maintainer: biD3V
