@@ -34,87 +34,19 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.bid3v.groundedprefs</string>
-			<key>key</key>
-			<string>airplane</string>
+			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Airplane Mode</string>
-			<key>PostNotification</key>
-			<string>com.bid3v.groundedprefs.changed</string>
+			<string>Connectivity Toggles</string>
+			<key>detail</key>
+			<string>GRDConnectivityListController</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.bid3v.groundedprefs</string>
-			<key>key</key>
-			<string>cellular</string>
+			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Cellular Data</string>
-			<key>PostNotification</key>
-			<string>com.bid3v.groundedprefs.changed</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.bid3v.groundedprefs</string>
-			<key>key</key>
-			<string>wifi</string>
-			<key>label</key>
-			<string>Wi-Fi</string>
-			<key>PostNotification</key>
-			<string>com.bid3v.groundedprefs.changed</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.bid3v.groundedprefs</string>
-			<key>key</key>
-			<string>bluetooth</string>
-			<key>label</key>
-			<string>Bluetooth</string>
-			<key>PostNotification</key>
-			<string>com.bid3v.groundedprefs.changed</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.bid3v.groundedprefs</string>
-			<key>key</key>
-			<string>airdrop</string>
-			<key>label</key>
-			<string>AirDrop</string>
-			<key>PostNotification</key>
-			<string>com.bid3v.groundedprefs.changed</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.bid3v.groundedprefs</string>
-			<key>key</key>
-			<string>hotspot</string>
-			<key>label</key>
-			<string>Personal Hotspot</string>
-			<key>PostNotification</key>
-			<string>com.bid3v.groundedprefs.changed</string>
+			<string>Modules</string>
+			<key>detail</key>
+			<string>GRDModulesListController</string>
 		</dict>
 	</array>
 	<key>title</key>

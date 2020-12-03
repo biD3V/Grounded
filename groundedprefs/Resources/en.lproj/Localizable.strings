@@ -1,0 +1,15 @@
+{
+    "ConnectivityModule" = "Connectivity";
+    "MediaControlsModule" = "Media Controls";
+    "DoNotDisturbModule" = "Do Not Disturb";
+    "OrientationLockModule" = "Orientation Lock";
+    "AudioModule" = "Volume";
+    "DisplayModule" = "Brightness";
+    "Screen Mirroring" = "Screen Mirroring";
+    "ReplayKitModule" = "Screen Record";
+
+    "ENABLE" = "Enable";
+    "CONNECTIVITY" = "Connectivity Toggles";
+    "MODULES" = "Modules";
+    "USAGE_INFO" = "Disabled toggles will not be usable when locked.";
+}

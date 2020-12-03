@@ -1,6 +1,39 @@
 @interface CCUIRoundButton : UIControl
 @end
 
+@interface CCUIButtonModuleView : UIControl
+@end
+
+@interface CCUIButtonModuleViewController : UIViewController
+
+@property (nonatomic,readonly) CCUIButtonModuleView *buttonView;
+
+@end
+
+@interface CCUIContentModuleContext : NSObject
+
+@property (nonatomic,copy,readonly) NSString *moduleIdentifier;
+
+@end
+
+@interface CCUIToggleModule : NSObject
+
+@property (nonatomic,retain) CCUIContentModuleContext *contentModuleContext;
+
+@end
+
+@interface CCUIToggleViewController : CCUIButtonModuleViewController
+
+@property (assign,nonatomic) CCUIToggleModule *module;
+
+@end
+
+@interface CCUIMenuModuleViewController : CCUIButtonModuleViewController
+
+@property (nonatomic,retain) CCUIContentModuleContext *contentModuleContext;
+
+@end
+
 @interface SBLockStateAggregator : NSObject {
 	NSInteger _lockState;
 }
@@ -58,6 +91,44 @@ static void loadPrefs() {
 		}
 	}
 	return %orig;
+}
+
+%end
+
+%hook CCUIToggleViewController
+
+- (void)viewWillAppear:(BOOL)appear {
+	%orig(appear);
+
+	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
+	BOOL locked = [[%c(SBLockStateAggregator) sharedInstance] lockState] != 0 && [[%c(SBLockStateAggregator) sharedInstance] lockState] != 1;
+
+	if (locked && enabled && !boolPref(prefs, self.module.contentModuleContext.moduleIdentifier)) {
+		[self.buttonView setEnabled:false];
+		[self.buttonView setAlpha:0.5];
+	} else {
+		[self.buttonView setEnabled:true];
+		[self.buttonView setAlpha:1.0];
+	}
+}
+
+%end
+
+%hook CCUIMenuModuleViewController
+
+- (void)viewWillAppear:(BOOL)appear {
+	%orig(appear);
+
+	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
+	BOOL locked = [[%c(SBLockStateAggregator) sharedInstance] lockState] != 0 && [[%c(SBLockStateAggregator) sharedInstance] lockState] != 1;
+
+	if (locked && enabled && !boolPref(prefs, self.contentModuleContext.moduleIdentifier)) {
+		[self.buttonView setEnabled:false];
+		[self.buttonView setAlpha:0.5];
+	} else {
+		[self.buttonView setEnabled:true];
+		[self.buttonView setAlpha:1.0];
+	}
 }
 
 %end
