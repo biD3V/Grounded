@@ -22,7 +22,7 @@
 			<key>key</key>
 			<string>airplane</string>
 			<key>label</key>
-			<string>Airplane Mode</string>
+			<string>AIRPLANE_MODE</string>
 			<key>PostNotification</key>
 			<string>com.bid3v.groundedprefs.changed</string>
 		</dict>
@@ -36,7 +36,7 @@
 			<key>key</key>
 			<string>cellular</string>
 			<key>label</key>
-			<string>Cellular Data</string>
+			<string>CELLULAR_DATA</string>
 			<key>PostNotification</key>
 			<string>com.bid3v.groundedprefs.changed</string>
 		</dict>
@@ -50,7 +50,7 @@
 			<key>key</key>
 			<string>wifi</string>
 			<key>label</key>
-			<string>Wi-Fi</string>
+			<string>WI_FI</string>
 			<key>PostNotification</key>
 			<string>com.bid3v.groundedprefs.changed</string>
 		</dict>
@@ -64,7 +64,7 @@
 			<key>key</key>
 			<string>bluetooth</string>
 			<key>label</key>
-			<string>Bluetooth</string>
+			<string>BLUETOOTH</string>
 			<key>PostNotification</key>
 			<string>com.bid3v.groundedprefs.changed</string>
 		</dict>
@@ -78,7 +78,7 @@
 			<key>key</key>
 			<string>airdrop</string>
 			<key>label</key>
-			<string>AirDrop</string>
+			<string>AIRDROP</string>
 			<key>PostNotification</key>
 			<string>com.bid3v.groundedprefs.changed</string>
 		</dict>
@@ -92,12 +92,12 @@
 			<key>key</key>
 			<string>hotspot</string>
 			<key>label</key>
-			<string>Personal Hotspot</string>
+			<string>PERSONAL_HOTSPOT</string>
 			<key>PostNotification</key>
 			<string>com.bid3v.groundedprefs.changed</string>
 		</dict>
 	</array>
 	<key>title</key>
-	<string>Grounded</string>
+	<string>Connectivity Toggles</string>
 </dict>
 </plist>

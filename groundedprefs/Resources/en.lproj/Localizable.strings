@@ -12,4 +12,11 @@
     "CONNECTIVITY" = "Connectivity Toggles";
     "MODULES" = "Modules";
     "USAGE_INFO" = "Disabled toggles will not be usable when locked.";
+
+    "AIRPLANE_MODE" = "Airplane Mode";
+    "CELLULAR_DATA" = "Cellular Data";
+    "WI_FI" = "Wi-Fi";
+    "BLUETOOTH" = "Bluetooth";
+    "AIRDROP" = "AirDrop";
+    "PERSONAL_HOTSPOT" = "Personal Hotspot";
 }

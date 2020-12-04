@@ -1,10 +1,14 @@
 #include "GRDConnectivityListController.h"
+#include "Localize.h"
 
 @implementation GRDConnectivityListController
 
 - (NSArray *)specifiers {
 	if (!_specifiers) {
 		_specifiers = [self loadSpecifiersFromPlistName:@"Connectivity" target:self];
+		for(PSSpecifier *spec in _specifiers) {
+			if ([spec name]) [spec setName:[[self bundle] localizedStringForKey:[spec name] value:english([spec name]) table:nil]];
+		}
 	}
 
 	return _specifiers;

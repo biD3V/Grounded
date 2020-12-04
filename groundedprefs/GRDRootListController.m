@@ -1,10 +1,17 @@
 #include "GRDRootListController.h"
+#include "Localize.h"
 
 @implementation GRDRootListController
 
 - (NSArray *)specifiers {
 	if (!_specifiers) {
 		_specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+		for(PSSpecifier *spec in _specifiers) {
+			if ([spec name]) [spec setName:[[self bundle] localizedStringForKey:[spec name] value:english([spec name]) table:nil]];
+			NSString *value = [spec propertyForKey:@"footerText"];
+				if(value)
+					[spec setProperty:[[self bundle] localizedStringForKey:value value:english(value) table:nil] forKey:@"footerText"];
+		}
 	}
 
 	return _specifiers;

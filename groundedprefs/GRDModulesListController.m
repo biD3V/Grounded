@@ -1,61 +1,25 @@
 #include "GRDModulesListController.h"
-
-// Taken from CCSupport https://github.com/opa334/CCSupport/blob/939095586188a17c53ee74cad812979e3f3e1037/Tweak.xm#L12-L44
-NSDictionary* englishLocalizations;
-//Get localized string for given key
-NSString *localize(NSString *key) {
-    NSBundle *GroundedPrefsBundle = [NSBundle bundleWithPath:@"/Library/PreferenceBundles/GroundedPrefs.bundle"];
-
-	if ([key isEqualToString:@"MediaControlsAudioModule"]) key = @"AudioModule"; //Fix Volume name on 13 and above
-	
-	NSString* localizedString = [GroundedPrefsBundle localizedStringForKey:key value:@"" table:nil];
-
-	if ([localizedString isEqualToString:@""])
-	{
-		if (!englishLocalizations) englishLocalizations = [NSDictionary dictionaryWithContentsOfFile:[GroundedPrefsBundle pathForResource:@"Localizable" ofType:@"strings" inDirectory:@"en.lproj"]];
-
-		//If no localization was found, fallback to english
-		NSString* engString = [englishLocalizations objectForKey:key];
-
-		if(engString) {
-			return engString;
-		} else {
-			//If an english localization was not found, just return the key itself
-			return key;
-		}
-	}
-
-	return localizedString;
-}
+#include "Localize.h"
 
 @implementation GRDModulesListController
 
 - (NSArray *)specifiers {
 	if (!_specifiers) {
         _specifiers = [NSMutableArray new];
-        NSString *defaultPath = @"/var/mobile/Library/ControlCenter/ModuleConfiguration.plist";
-        NSString *ccSupportPath = @"/var/mobile/Library/ControlCenter/ModuleConfiguration_CCSupport.plist";
-        //NSBundle *GroundedPrefsBundle = [NSBundle bundleWithPath:@"/Library/PreferenceBundles/GroundedPrefs.bundle"];
-        NSDictionary *moduleConfiguration;
-        if ([[NSFileManager defaultManager] fileExistsAtPath:ccSupportPath]) {
-            moduleConfiguration = [NSDictionary dictionaryWithContentsOfFile:ccSupportPath];
-        } else {
-            moduleConfiguration = [NSDictionary dictionaryWithContentsOfFile:defaultPath];
-        }
-        NSMutableArray <NSBundle *>*bundles = [NSMutableArray new];
-        [bundles addObjectsFromArray:[self CCBundles]];
-        //freopen([@"/var/mobile/Documents/Bundles.txt" cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
-        for (NSString *moduleIdentifier in moduleConfiguration[@"module-identifiers"]) {
-            NSBundle *moduleBundle = [NSBundle new];
-            for (NSBundle *bundle in bundles) {
-                if ([[bundle bundleIdentifier] isEqualToString:moduleIdentifier]) {
-                    // [specifier setProperty:[bundle infoDictionary][@"CFBundleDisplayName"] ?: moduleIdentifier forKey:@"name"];
-                    //[bundles removeObject:bundle];
-                    moduleBundle = bundle;
-                }
-            }
-            //NSLog(@"GRD moduleBundle: %@", [moduleBundle infoDictionary][@"CFBundleName"]);
-            BOOL screenrecord = [[moduleBundle infoDictionary][@"CFBundleDisplayName"] isEqualToString:@"CFBundleDisplayName"]; // For some reason ReplayKitModule(Screen Recording is improperly named)
+        
+        // Get module identifiers in order
+        NSArray *moduleConfiguration = [[CCSModuleSettingsProvider sharedProvider] orderedFixedModuleIdentifiers] ? [[[CCSModuleSettingsProvider sharedProvider] orderedFixedModuleIdentifiers] arrayByAddingObjectsFromArray:[[CCSModuleSettingsProvider sharedProvider] orderedUserEnabledModuleIdentifiers]] : [[CCSModuleSettingsProvider sharedProvider] orderedUserEnabledModuleIdentifiers];
+        
+        // Get the module repository
+        // Gives us useful info about modules
+        CCSModuleRepository *moduleRepo = [CCSModuleRepository repositoryWithDefaults];
+        // Go through all modules in Control Center
+        for (NSString *moduleIdentifier in moduleConfiguration) {
+            // Get the bundle for module
+            NSBundle *moduleBundle = [NSBundle bundleWithURL:[[moduleRepo moduleMetadataForModuleIdentifier:moduleIdentifier] moduleBundleURL]];
+            // For some reason ReplayKitModule(Screen Recording) is improperly named
+            BOOL screenrecord = [[moduleBundle infoDictionary][@"CFBundleDisplayName"] isEqualToString:@"CFBundleDisplayName"];
+            // Create specifier for module and get localized name
             PSSpecifier *specifier = [PSSpecifier preferenceSpecifierNamed:([moduleBundle infoDictionary][@"CFBundleDisplayName"] && !screenrecord) ? [moduleBundle infoDictionary][@"CFBundleDisplayName"] : localize([moduleBundle infoDictionary][@"CFBundleName"])
                 target:self
                 set:@selector(setPreferenceValue:specifier:)
@@ -63,10 +27,6 @@ NSString *localize(NSString *key) {
                 detail:nil
                 cell:PSSwitchCell
                 edit:nil];
-            //[specifier removePropertyForKey:@"cell"];
-            //[specifier setProperty:@"GRDSwitchTableCell" forKey:@"cellClass"];
-            // [specifier setProperty:@YES forKey:@"hasIcon"];
-            // [specifier setProperty:[GroundedPrefsBundle pathForResource:moduleIdentifier ofType:@"png"] forKey:@"icon"];
             [specifier setProperty:@YES forKey:@"enabled"];
             [specifier setProperty:moduleIdentifier forKey:@"key"];
             [specifier setProperty:@YES forKey:@"default"];
@@ -79,12 +39,6 @@ NSString *localize(NSString *key) {
 
 	return _specifiers;
 }
-
-// - (void)viewWillAppear:(BOOL)appear {
-//     [super viewWillAppear:appear];
-
-//     [self CCBundles];
-// }
 
 - (id)readPreferenceValue:(PSSpecifier*)specifier {
 	NSString *path = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", specifier.properties[@"defaults"]];
@@ -103,19 +57,6 @@ NSString *localize(NSString *key) {
 	if (notificationName) {
 		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notificationName, NULL, NULL, YES);
 	}
-}
-
-- (NSArray <NSBundle *>*)CCBundles {
-    NSArray *bundleDirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/System/Library/ControlCenter/Bundles" error:nil];
-    NSMutableArray *bundleArray = [NSMutableArray new];
-    
-    for (NSString *bundlePath in bundleDirs) {
-        NSBundle *bundle = [NSBundle bundleWithPath:[NSString stringWithFormat:@"/System/Library/ControlCenter/Bundles/%@", bundlePath]];
-        [bundleArray addObject:bundle];
-        // NSLog(@"GRD Bundle: %@, %@", [bundle bundleIdentifier], bundle);
-    }
-    
-    return bundleArray;
 }
 
 @end

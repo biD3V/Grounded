@@ -18,17 +18,15 @@
 			<key>key</key>
 			<string>enabled</string>
 			<key>label</key>
-			<string>Enable</string>
+			<string>ENABLE</string>
 			<key>PostNotification</key>
 			<string>com.bid3v.groundedprefs.changed</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Enabled Toggles</string>
 			<key>footerText</key>
-			<string>Disabled toggles will not be usable when locked.</string>
+			<string>USAGE_INFO</string>
 			<key>footerAlignment</key>
 			<integer>0</integer>
 		</dict>
@@ -36,7 +34,7 @@
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Connectivity Toggles</string>
+			<string>CONNECTIVITY</string>
 			<key>detail</key>
 			<string>GRDConnectivityListController</string>
 		</dict>
@@ -44,7 +42,7 @@
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Modules</string>
+			<string>MODULES</string>
 			<key>detail</key>
 			<string>GRDModulesListController</string>
 		</dict>

@@ -1,52 +1,6 @@
-@interface CCUIRoundButton : UIControl
-@end
+#import "Tweak.h"
 
-@interface CCUIButtonModuleView : UIControl
-@end
-
-@interface CCUIButtonModuleViewController : UIViewController
-
-@property (nonatomic,readonly) CCUIButtonModuleView *buttonView;
-
-@end
-
-@interface CCUIContentModuleContext : NSObject
-
-@property (nonatomic,copy,readonly) NSString *moduleIdentifier;
-
-@end
-
-@interface CCUIToggleModule : NSObject
-
-@property (nonatomic,retain) CCUIContentModuleContext *contentModuleContext;
-
-@end
-
-@interface CCUIToggleViewController : CCUIButtonModuleViewController
-
-@property (assign,nonatomic) CCUIToggleModule *module;
-
-@end
-
-@interface CCUIMenuModuleViewController : CCUIButtonModuleViewController
-
-@property (nonatomic,retain) CCUIContentModuleContext *contentModuleContext;
-
-@end
-
-@interface SBLockStateAggregator : NSObject {
-	NSInteger _lockState;
-}
-+(id)sharedInstance;
--(NSInteger)lockState;
-@end
-
-@interface UIView (Grounded)
-
-@property (assign,setter=_setViewDelegate:,getter=_viewDelegate,nonatomic) UIViewController * viewDelegate;
-
-@end
-
+NSDictionary *prefs;
 BOOL enabled;
 BOOL airplane;
 BOOL cellular;
@@ -60,8 +14,6 @@ static BOOL boolPref(NSDictionary *prefs, NSString *key) {
 }
 
 static void loadPrefs() {
-	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
-
 	enabled = boolPref(prefs, @"enabled");
 	airplane = boolPref(prefs, @"airplane");
 	cellular = boolPref(prefs, @"cellular");
@@ -71,9 +23,12 @@ static void loadPrefs() {
 	hotspot = boolPref(prefs, @"hotspot");
 }
 
+// Modules like the Connectivity Module
 %hook CCUIRoundButton
 
 - (BOOL)isEnabled {
+	// Create locked bool
+	// 0 and 1 are both unlocked states
 	BOOL locked = [[%c(SBLockStateAggregator) sharedInstance] lockState] != 0 && [[%c(SBLockStateAggregator) sharedInstance] lockState] != 1;
 	if (locked && enabled) {
 		if ([[self.superview _viewDelegate] isKindOfClass:objc_getClass("CCUIConnectivityAirplaneViewController")] && !airplane) {
@@ -95,17 +50,18 @@ static void loadPrefs() {
 
 %end
 
+// Normal modules
 %hook CCUIToggleViewController
 
 - (void)viewWillAppear:(BOOL)appear {
 	%orig(appear);
 
-	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
+	//NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
 	BOOL locked = [[%c(SBLockStateAggregator) sharedInstance] lockState] != 0 && [[%c(SBLockStateAggregator) sharedInstance] lockState] != 1;
 
 	if (locked && enabled && !boolPref(prefs, self.module.contentModuleContext.moduleIdentifier)) {
 		[self.buttonView setEnabled:false];
-		[self.buttonView setAlpha:0.5];
+		[self.buttonView setAlpha:0.5]; // Make disabled modules look disabled
 	} else {
 		[self.buttonView setEnabled:true];
 		[self.buttonView setAlpha:1.0];
@@ -114,12 +70,13 @@ static void loadPrefs() {
 
 %end
 
+// Modules like the Screen Mirroring module
 %hook CCUIMenuModuleViewController
 
 - (void)viewWillAppear:(BOOL)appear {
 	%orig(appear);
 
-	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
+	//NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
 	BOOL locked = [[%c(SBLockStateAggregator) sharedInstance] lockState] != 0 && [[%c(SBLockStateAggregator) sharedInstance] lockState] != 1;
 
 	if (locked && enabled && !boolPref(prefs, self.contentModuleContext.moduleIdentifier)) {
@@ -133,7 +90,26 @@ static void loadPrefs() {
 
 %end
 
+// Slider Modules (Brightness & Volume)
+%hook CCUIContinuousSliderView
+
+- (BOOL)isEnabled {
+	BOOL locked = [[%c(SBLockStateAggregator) sharedInstance] lockState] != 0 && [[%c(SBLockStateAggregator) sharedInstance] lockState] != 1;
+	if (locked && enabled) {
+		if (!boolPref(prefs, @"com.apple.control-center.DisplayModule") && [[self.allTargets allObjects][0] isKindOfClass:NSClassFromString(@"CCUIDisplayModuleViewController")]) {
+			return false;
+		} else if (!boolPref(prefs, @"com.apple.mediaremote.controlcenter.audio") && [[self.allTargets allObjects][0] isKindOfClass:NSClassFromString(@"MediaControlsVolumeViewController")]) {
+			return false;
+		}
+	}
+
+	return %orig;
+}
+
+%end
+
 %ctor {
+	prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.bid3v.groundedprefs.plist"];
 	loadPrefs();
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)loadPrefs, CFSTR("com.bid3v.groundedprefs.changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 }
